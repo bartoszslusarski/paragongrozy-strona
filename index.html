@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paragon Grozy – rodzinne wydatki bez grozy</title>
+  <meta name="description" content="Paragon Grozy to aplikacja dla rodzin: wspólne wydatki, limity, kieszonkowe dzieci i skanowanie paragonów zdjęciem.">
+  <meta name="theme-color" content="#0E3B5C">
+  <link rel="icon" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Courier+Prime:wght@700&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="logo" href="/">Paragon Grozy</a>
+      <nav><a href="/wsparcie/">Wsparcie</a><a href="/prywatnosc/">Prywatność</a></nav>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <span class="badge">Wkrótce na iPhone'a</span>
+        <h1>Rodzinne wydatki bez grozy</h1>
+        <p>Cała rodzina wpisuje wydatki w jednym miejscu. Zrób zdjęcie paragonu, a Grozik sam rozpisze go na kategorie. Gdy limit się kończy, Grozik robi minę.</p>
+        <form class="join" id="join" novalidate>
+          <label class="hp" aria-hidden="true">Nie wypełniaj <input name="website" tabindex="-1" autocomplete="off"></label>
+          <input type="email" name="email" placeholder="Twój e-mail" autocomplete="email" required aria-label="Twój e-mail">
+          <button type="submit">Chcę wiedzieć pierwszy</button>
+        </form>
+        <p class="msg" id="msg" role="status"></p>
+        <p class="small">Napiszemy tylko wtedy, gdy aplikacja będzie dostępna. Wypisać się możesz w każdej chwili – szczegóły w <a href="/prywatnosc/">polityce prywatności</a>.</p>
+      </div>
+      <img src="/grozik-szok.svg" alt="Grozik – maskotka Paragonu Grozy, zaskoczony długim paragonem" width="300" height="300">
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <h2>Co robi Paragon Grozy?</h2>
+      <div class="grid">
+        <div class="card"><span class="e">📸</span><b>Skan paragonu</b>Zdjęcie, zrzut ekranu albo PDF – produkty same trafiają do kategorii, a aplikacja uczy się Waszych poprawek.</div>
+        <div class="card"><span class="e">👨‍👩‍👧‍👦</span><b>Cała rodzina</b>Każdy dopisuje swoje wydatki, a wszyscy widzą wspólny stan budżetu.</div>
+        <div class="card"><span class="e">🎯</span><b>Limity</b>Limity na kategorie i powiadomienie, zanim budżet się skończy.</div>
+        <div class="card"><span class="e">🪙</span><b>Kieszonkowe</b>Dzieci widzą, ile im zostało, a na większy zakup proszą o zgodę w aplikacji.</div>
+        <div class="card"><span class="e">🙈</span><b>Niespodzianki</b>Prezent można ukryć przed resztą rodziny i odkryć w wybranym dniu.</div>
+        <div class="card"><span class="e">😱</span><b>Grozik</b>Minę zmienia razem z budżetem – od spokoju do <span class="receipt">PARAGONU GROZY</span>.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <a href="/wsparcie/">Wsparcie</a><a href="/prywatnosc/">Polityka prywatności</a><a href="mailto:kontakt@paragongrozy.app">kontakt@paragongrozy.app</a>
+      <p>© 2026 Paragon Grozy</p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var form = document.getElementById('join');
+      var msg = document.getElementById('msg');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var email = form.email.value.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { msg.textContent = 'Wpisz poprawny adres e-mail.'; return; }
+        var btn = form.querySelector('button');
+        btn.disabled = true;
+        msg.textContent = 'Zapisuję…';
+        fetch('https://aazzqcqiryxgdskuhvwk.supabase.co/functions/v1/lista-chetnych', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, website: form.website.value })
+        })
+          .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
+          .then(function (res) {
+            if (res.ok) { msg.textContent = 'Dzięki! Damy znać, gdy Paragon Grozy będzie gotowy. 🎉'; form.reset(); }
+            else { msg.textContent = (res.b && res.b.error) || 'Nie udało się zapisać. Spróbuj za chwilę.'; }
+          })
+          .catch(function () { msg.textContent = 'Brak połączenia. Spróbuj za chwilę.'; })
+          .finally(function () { btn.disabled = false; });
+      });
+    })();
+  </script>
+</body>
+</html>
